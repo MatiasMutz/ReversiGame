@@ -1,0 +1,21 @@
+# Virtual environment
+.venv/
+env/
+venv/
+
+# Pycharm
+.idea/
+.idea/*
+
+# Python files and folders
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# log and temp files
+*.log
+*.tmp
+
+# macOS
+.DS_Store
