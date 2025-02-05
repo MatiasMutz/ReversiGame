@@ -1,20 +1,20 @@
 import numpy as np
 import math
 
-# Constantes
+# Constants
 BLACK, WHITE, EMPTY = 0, 1, 2
 DIRECTIONS = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 
-# Matriz de valores posicionales
+# Grid score
 SCORES = [
-    [100, -25, 10,  5,  5, 10, -25, 100],
-    [-25, -50,  0,  0,  0,  0, -50, -25],
-    [10,   0,  5,  1,  1,  5,  0,  10],
-    [ 5,   0,  1,  2,  2,  1,  0,   5],
-    [ 5,   0,  1,  2,  2,  1,  0,   5],
-    [10,   0,  5,  1,  1,  5,  0,  10],
-    [-25, -50,  0,  0,  0,  0, -50, -25],
-    [100, -25, 10,  5,  5, 10, -25, 100]
+    [100, -20, 10,  5,  5, 10, -20, 100],
+    [-20, -50, -2, -2, -2, -2, -50, -20],
+    [ 10,  -2,  5,  1,  1,  5,  -2,  10],
+    [  5,  -2,  1,  2,  2,  1,  -2,   5],
+    [  5,  -2,  1,  2,  2,  1,  -2,   5],
+    [ 10,  -2,  5,  1,  1,  5,  -2,  10],
+    [-20, -50, -2, -2, -2, -2, -50, -20],
+    [100, -20, 10,  5,  5, 10, -20, 100]
 ]
 
 class Othello:
@@ -66,21 +66,36 @@ class Othello:
                 for flip_r, flip_c in cells_to_flip:
                     board[flip_r, flip_c] = player
 
+    def heuristic(self, board, player):
+        opponent = BLACK if player == WHITE else WHITE
+        score = 0
+
+        # Positional values from SCORES matrix
+        for i in range(8):
+            for j in range(8):
+                if board[i][j] == BLACK:
+                    score += SCORES[i][j]
+                elif board[i][j] == WHITE:
+                    score -= SCORES[i][j]
+
+        # Number of possible moves for both players
+        player_moves = len(self.get_valid_moves(board, player))
+        opponent_moves = len(self.get_valid_moves(board, opponent))
+        score += (player_moves - opponent_moves) * 5 # Weighted difference
+
+        return score if player == BLACK else -score
+
     def minimax(self, board, depth, alpha, beta, maximizing_player, player):
         if depth == 0:
-            score = 0
-            for i in range(8):
-                for j in range(8):
-                    if board[i][j] == BLACK:
-                        score += SCORES[i][j]
-                    elif board[i][j] == WHITE:
-                        score -= SCORES[i][j]
-            return score if player == BLACK else -score, None
+            return self.heuristic(board, player), None
 
         valid_moves = self.get_valid_moves(board, player)
         if not valid_moves:
-            return self.minimax(board, depth - 1, alpha, beta, not maximizing_player, 
-                              WHITE if player == BLACK else BLACK)[0], None
+            opponent = WHITE if player == BLACK else BLACK
+            if not self.get_valid_moves(board, opponent):  # If opponent also has no moves, return evaluation
+                score = sum(SCORES[i][j] if board[i][j] == BLACK else -SCORES[i][j] for i in range(8) for j in range(8))
+                return (score, None) if player == BLACK else (-score, None)
+            return self.minimax(board, depth - 1, alpha, beta, not maximizing_player, opponent)
 
         best_move = None
         if maximizing_player:
