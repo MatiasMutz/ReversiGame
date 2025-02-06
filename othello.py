@@ -145,7 +145,7 @@ class Othello:
                 if self.last_move and (i, j) == (self.last_move[0], self.last_move[1]):  # Highlight last move
                     print(last_move_symbols[self.last_move[2]], end=' ')
                 elif (i, j) in valid_moves:
-                    print('X ', end=' ')  # Keep valid move indicator as X
+                    print(f"{RED}X{RESET} ", end=' ')  # Keep valid move indicator as X
                 else:
                     print(symbols[cell], end=' ')
             print()
