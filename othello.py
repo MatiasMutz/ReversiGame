@@ -83,7 +83,7 @@ class Othello:
         # Number of possible moves for both players
         player_moves = len(self.get_valid_moves(board, player))
         opponent_moves = len(self.get_valid_moves(board, opponent))
-        score += (player_moves - opponent_moves) * 5 # Weighted difference
+        score += (player_moves - opponent_moves) * 10 # Weighted difference
 
         return score if player == BLACK else -score
 
