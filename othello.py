@@ -92,9 +92,8 @@ class Othello:
         valid_moves = self.get_valid_moves(board, player)
         if not valid_moves:
             opponent = WHITE if player == BLACK else BLACK
-            if not self.get_valid_moves(board, opponent):  # If opponent also has no moves, return evaluation
-                score = sum(SCORES[i][j] if board[i][j] == BLACK else -SCORES[i][j] for i in range(8) for j in range(8))
-                return (score, None) if player == BLACK else (-score, None)
+            if not self.get_valid_moves(board, opponent):  # If opponent also has no moves, return heuristic
+                return self.heuristic(board, player), None
             return self.minimax(board, depth - 1, alpha, beta, not maximizing_player, opponent)
 
         best_move = None
