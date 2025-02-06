@@ -22,6 +22,7 @@ class Othello:
         self.board = self.initialize_board()
         self.current_player = BLACK
         self.human_player = None
+        self.last_move = None
 
     def initialize_board(self):
         board = np.full((8, 8), EMPTY)
@@ -52,6 +53,7 @@ class Othello:
 
     def apply_move(self, board, row, col, player):
         board[row, col] = player
+        self.last_move = (row, col, player)
         opponent = WHITE if player == BLACK else BLACK
         
         for dr, dc in DIRECTIONS:
@@ -128,25 +130,26 @@ class Othello:
 
     def print_board(self):
         symbols = {BLACK: '⚫', WHITE: '⚪', EMPTY: '· '}
-        # Código de color ANSI para rojo
+        last_move_symbols = {BLACK: '🖤', WHITE: '🤍'}
         RED = '\033[91m'
-        # Código para resetear el color
         RESET = '\033[0m'
         
         print("  " + " ".join(str(i) + " " for i in range(8)))
         
-        # Obtener movimientos válidos para el jugador actual
+        # Obtain valid moves for current player
         valid_moves = self.get_valid_moves(self.board, self.current_player)
         
         for i, row in enumerate(self.board):
             print(f"{i} ", end='')
             for j, cell in enumerate(row):
-                if (i, j) in valid_moves:
-                    print(f'{RED}X {RESET}', end=' ')
+                if self.last_move and (i, j) == (self.last_move[0], self.last_move[1]):  # Highlight last move
+                    print(last_move_symbols[self.last_move[2]], end=' ')
+                elif (i, j) in valid_moves:
+                    print('X ', end=' ')  # Keep valid move indicator as X
                 else:
                     print(symbols[cell], end=' ')
             print()
-        
+            
         black_count = np.sum(self.board == BLACK)
         white_count = np.sum(self.board == WHITE)
         print(f"Score -> Black: {black_count}, White: {white_count}\n")
